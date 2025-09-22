@@ -120,18 +120,17 @@ def breadthFirstSearch(problem):
     bfsQueue = Queue()
     bfsQueue.push((problem.getStartState(), []))
     
-    visited = set()
+    visited = set([problem.getStartState()])
     
     while not bfsQueue.isEmpty():
         state, actions = bfsQueue.pop()
-        if state not in visited:
-            visited.add(state)
-            
+
         if(problem.isGoalState(state)):
             return actions
         
         for succ, action, cost in problem.getSuccessors(state):
             if succ not in visited:
+                visited.add(succ)
                 bfsQueue.push((succ, actions + [action]))
                 
     return []
@@ -143,12 +142,14 @@ def uniformCostSearch(problem):
     from util import PriorityQueue
     
     ucsQueue = PriorityQueue()
-    ucsQueue.push((problem.getStartState(), []), 0)
+    ucsQueue.push((problem.getStartState(), [], 0), 0)
     
     visited = set()
+    best_g = {problem.getStartState(): 0}
     
     while not ucsQueue.isEmpty():
-        state, actions = ucsQueue.pop()
+        state, actions, g = ucsQueue.pop()
+        
         if state not in visited:
             visited.add(state)
             
@@ -156,8 +157,10 @@ def uniformCostSearch(problem):
             return actions
         
         for succ, action, cost in problem.getSuccessors(state):
-            if succ not in visited:
-                ucsQueue.push((succ, actions + [action]), cost)
+            new_g = g + cost
+            if succ not in best_g or new_g < best_g[succ]:
+                best_g[succ] = new_g
+                ucsQueue.push((succ, actions + [action], new_g), new_g)
                 
     return []
 
@@ -174,12 +177,14 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
     aStarQueue = PriorityQueue()
     start_state = problem.getStartState()
-    aStarQueue.push((start_state, []), heuristic(start_state, problem))
+    aStarQueue.push((start_state, [], 0), heuristic(start_state, problem))
 
     visited = set()
+    best_g = {start_state: 0}
 
     while not aStarQueue.isEmpty():
-        state, actions = aStarQueue.pop()
+        state, actions, g = aStarQueue.pop()
+        
         if state not in visited:
             visited.add(state)
 
@@ -187,11 +192,12 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             return actions
 
         for succ, action, cost in problem.getSuccessors(state):
-            if succ not in visited:
+            new_g = g + cost
+            if succ not in best_g or new_g < best_g[succ]:
+                best_g[succ] = new_g
                 new_actions = actions + [action]
-                g = problem.getCostOfActions(new_actions)
-                h = heuristic(succ, problem)
-                aStarQueue.push((succ, new_actions), g + h)
+                f = new_g + heuristic(succ, problem)
+                aStarQueue.push((succ, new_actions, new_g), f)
 
     return []
 
