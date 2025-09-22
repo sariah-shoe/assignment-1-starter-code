@@ -87,6 +87,39 @@ def depthFirstSearch(problem):
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
+    # Make my directions that I'll use later when I have a solution
+    from util import Stack
+    from game import Directions;
+    
+    directionDict = {
+        "North" : Directions.NORTH,
+        "East" : Directions.EAST,
+        "South" : Directions.SOUTH,
+        "West" : Directions.WEST
+    }
+
+    
+    # Initialize my stack
+    dfsStack = Stack()
+    dfsStack.push((problem.getStartState(), []))
+    
+    # Make a list to keep my visited nodes so I don't do repeat work
+    visited = set()
+        
+    while not dfsStack.isEmpty():
+        state, actions = dfsStack.pop()
+        if state in visited:
+            continue
+        visited.add(state)
+        
+        if(problem.isGoalState(state)):
+            return actions
+        
+        for succ, action, cost in problem.getSuccessors(state):
+            if succ not in visited:
+                dfsStack.push((succ, actions + [directionDict[action]]))
+                
+    return []
 
 
 def breadthFirstSearch(problem):
