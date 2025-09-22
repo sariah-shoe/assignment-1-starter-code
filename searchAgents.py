@@ -35,6 +35,8 @@ from game import Actions
 import util
 import time
 import search
+import math
+import random
 
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
@@ -254,11 +256,16 @@ def manhattanHeuristic(position, problem, info={}):
 def euclideanHeuristic(position, problem, info={}):
     "The Euclidean distance heuristic for a PositionSearchProblem"
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    x1 = position[0]
+    y1 = position[1]
+    x2 = problem.goal[0]
+    y2 = problem.goal[0]
+    
+    return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
 
 def randomHeuristic(position, problem, info={}):
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    return(random.randint(1,10))
 
 #####################################################
 # This portion is incomplete.  Time to write code!  #

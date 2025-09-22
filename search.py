@@ -89,16 +89,7 @@ def depthFirstSearch(problem):
     """
     # Make my directions that I'll use later when I have a solution
     from util import Stack
-    from game import Directions;
-    
-    directionDict = {
-        "North" : Directions.NORTH,
-        "East" : Directions.EAST,
-        "South" : Directions.SOUTH,
-        "West" : Directions.WEST
-    }
 
-    
     # Initialize my stack
     dfsStack = Stack()
     dfsStack.push((problem.getStartState(), []))
@@ -108,16 +99,15 @@ def depthFirstSearch(problem):
         
     while not dfsStack.isEmpty():
         state, actions = dfsStack.pop()
-        if state in visited:
-            continue
-        visited.add(state)
+        if state not in visited:
+            visited.add(state)
         
         if(problem.isGoalState(state)):
             return actions
         
         for succ, action, cost in problem.getSuccessors(state):
             if succ not in visited:
-                dfsStack.push((succ, actions + [directionDict[action]]))
+                dfsStack.push((succ, actions + [action]))
                 
     return []
 
@@ -125,12 +115,51 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"   
-    util.raiseNotDefined()
+    from util import Queue
+    
+    bfsQueue = Queue()
+    bfsQueue.push((problem.getStartState(), []))
+    
+    visited = set()
+    
+    while not bfsQueue.isEmpty():
+        state, actions = bfsQueue.pop()
+        if state not in visited:
+            visited.add(state)
+            
+        if(problem.isGoalState(state)):
+            return actions
+        
+        for succ, action, cost in problem.getSuccessors(state):
+            if succ not in visited:
+                bfsQueue.push((succ, actions + [action]))
+                
+    return []
+        
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import PriorityQueue
+    
+    ucsQueue = PriorityQueue()
+    ucsQueue.push((problem.getStartState(), []), 0)
+    
+    visited = set()
+    
+    while not ucsQueue.isEmpty():
+        state, actions = ucsQueue.pop()
+        if state not in visited:
+            visited.add(state)
+            
+        if(problem.isGoalState(state)):
+            return actions
+        
+        for succ, action, cost in problem.getSuccessors(state):
+            if succ not in visited:
+                ucsQueue.push((succ, actions + [action]), cost)
+                
+    return []
 
 def nullHeuristic(state, problem=None):
     """
@@ -141,8 +170,30 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import PriorityQueue
+
+    aStarQueue = PriorityQueue()
+    start_state = problem.getStartState()
+    aStarQueue.push((start_state, []), heuristic(start_state, problem))
+
+    visited = set()
+
+    while not aStarQueue.isEmpty():
+        state, actions = aStarQueue.pop()
+        if state not in visited:
+            visited.add(state)
+
+        if problem.isGoalState(state):
+            return actions
+
+        for succ, action, cost in problem.getSuccessors(state):
+            if succ not in visited:
+                new_actions = actions + [action]
+                g = problem.getCostOfActions(new_actions)
+                h = heuristic(succ, problem)
+                aStarQueue.push((succ, new_actions), g + h)
+
+    return []
 
 
 # Abbreviations
